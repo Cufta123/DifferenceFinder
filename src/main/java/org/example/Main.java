@@ -10,8 +10,9 @@ public class Main {
         try {
             List<ESPRecord> espRecords = FileProcessor.readESPFile("src/main/java/org/example/xlsx_files/ESP_Bimedia_Flixbus_weekly_billing_report_20240916.csv");
             List<FlixBusRecord> flixbusRecords = FileProcessor.readFlixbusFile("src/main/java/org/example/xlsx_files/Flixbus-Booking-report-129005-Own.Solutions-Bimedia.xlsx");
-
-            Comparator.compareFiles(espRecords, flixbusRecords);
+            List<FlixBusRecord> flixbusFeeRecords = FileProcessor.readFlixBusFileFee("src/main/java/org/example/xlsx_files/Flixbus-Booking-report-129005-Own.Solutions-Bimedia.xlsx");
+            ComparingFiles.compareFiles(espRecords, flixbusRecords);
+            ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords); // Pass both lists
         } catch (IOException e) {
             e.printStackTrace();
         }
