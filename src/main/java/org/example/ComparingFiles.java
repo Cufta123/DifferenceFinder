@@ -91,22 +91,21 @@ public class ComparingFiles {
             String flixbusSerial = i < flixbusRecords.size() ? formatSerialNumber(flixbusRecords.get(i).getBookingNumber()) : "N/A";
             String flixbusCash = i < flixbusRecords.size() ? String.format("%.2f", flixbusRecords.get(i).getCash()) : "N/A";
             String paymentType = i < flixbusRecords.size() ? flixbusRecords.get(i).getPaymentType() : "N/A";
-            String match = espSerial.equals(flixbusSerial) ? "Yes" : "Not the same";
+            String match = (espSerial.equals(flixbusSerial) && espAmount.equals(flixbusCash)) ? "Yes" : "No";
 
             if (!espSerial.equals(flixbusSerial) && i < flixbusRecords.size()) {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
                 i--; // Adjust the index after removal
             } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
-               // System.out.printf("%s | %s | %s | %s | %s | %s%n", espSerial, espAmount, flixbusSerial, flixbusCash, paymentType, match);
+                System.out.printf("%s | %s | %s | %s | %s | %s%n", espSerial, espAmount, flixbusSerial, flixbusCash, paymentType, match);
             }
         }
-        System.
-                out.printf("%-20s  | %-18s  | %-11s%n", "Booking number", "Cash", "Payment type");
+        System.out.printf("%-20s  | %-18s  | %-11s%n", "Booking number", "Cash", "Payment type");
         for (FlixBusRecord record : unmatchedFlixbusList) {
             String flixbusSerial = formatSerialNumber(record.getBookingNumber());
             String flixbusCash = String.format("%.2f", record.getCash());
             String paymentType = record.getPaymentType();
-           // System.out.printf("%-22s | %-19s | %s%n", flixbusSerial, flixbusCash, paymentType);
+            System.out.printf("%-22s | %-19s | %s%n", flixbusSerial, flixbusCash, paymentType);
         }
     }
 
