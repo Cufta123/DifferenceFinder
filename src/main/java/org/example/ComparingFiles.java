@@ -10,7 +10,8 @@ import java.util.logging.Logger;
 public class ComparingFiles {
     private static final Logger logger = Logger.getLogger(ComparingFiles.class.getName());
 
-    public static void compareFiles(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+    public static String compareFiles(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+        StringBuilder result = new StringBuilder();
         try {
             List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
             List<FlixBusRecord> combinedFlixbusList = combineFlixBusRecords(flixbusRecords);
@@ -23,28 +24,30 @@ public class ComparingFiles {
             double absoluteDifference = Math.abs(espTotalAmount - flixbusTotalCash);
             double totalComm_gross = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getComm_gross).sum();
             double commGrossSupplierMarginDiff = Math.abs(totalComm_gross - suplierMarginTotalAmount);
-            System.out.printf("ESP summary:     %.2f  |   Suplier Margin:   %.3f%nn" +
+            result.append(String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f%n" +
                             "Flixbus summary: %.2f  |   Total Comm_gross: %.3f%n" +
                             "Difference:      %.2f    |   Difference:       %.3f%n%n",
-                    espTotalAmount,suplierMarginTotalAmount  , flixbusTotalCash, totalComm_gross, absoluteDifference, commGrossSupplierMarginDiff);
+                    espTotalAmount, suplierMarginTotalAmount, flixbusTotalCash, totalComm_gross, absoluteDifference, commGrossSupplierMarginDiff));
 
-            printComparison(combinedESPList, combinedFlixbusList);
+            result.append(printComparison(combinedESPList, combinedFlixbusList));
         } catch (Exception e) {
             logger.severe("An error occurred while comparing files: " + e.getMessage());
             e.printStackTrace();
         }
+        return result.toString();
     }
 
-
-    public static void printServiceFee(List<ESPRecord> espRecords, List<FlixBusRecord> feeRecords) {
-        System.out.printf("%n%-20s | %-15s | %-10s%n", "FlixBus Booking Number", "Trip Services", "Cash");
+    public static String printServiceFee(List<ESPRecord> espRecords, List<FlixBusRecord> feeRecords) {
+        StringBuilder result = new StringBuilder();
+        result.append(String.format("%n%-20s | %-15s | %-10s%n", "FlixBus Booking Number", "Trip Services", "Cash"));
 
         List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
         List<FlixBusRecord> combinedFlixbusList = combineFlixBusRecords(feeRecords);
 
         sortRecords(combinedESPList, combinedFlixbusList);
 
-        printServiceFeeComparison(combinedESPList, combinedFlixbusList);
+        result.append(printServiceFeeComparison(combinedESPList, combinedFlixbusList));
+        return result.toString();
     }
 
     private static List<FlixBusRecord> combineFlixBusRecords(List<FlixBusRecord> flixbusRecords) {
@@ -81,7 +84,8 @@ public class ComparingFiles {
         flixbusRecords.sort(Comparator.comparing(FlixBusRecord::getBookingNumber));
     }
 
-    private static void printComparison(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+    private static String printComparison(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+        StringBuilder result = new StringBuilder();
         List<FlixBusRecord> unmatchedFlixbusList = new ArrayList<>();
 
         int maxSize = Math.max(espRecords.size(), flixbusRecords.size());
@@ -97,19 +101,21 @@ public class ComparingFiles {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
                 i--; // Adjust the index after removal
             } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
-                System.out.printf("%s | %s | %s | %s | %s | %s%n", espSerial, espAmount, flixbusSerial, flixbusCash, paymentType, match);
+              //  result.append(String.format("%s | %s | %s | %s | %s | %s%n", espSerial, espAmount, flixbusSerial, flixbusCash, paymentType, match));
             }
         }
-        System.out.printf("%-20s  | %-18s  | %-11s%n", "Booking number", "Cash", "Payment type");
+        result.append(String.format("%-20s  | %-18s  | %-11s%n", "Booking number", "Cash", "Payment type"));
         for (FlixBusRecord record : unmatchedFlixbusList) {
             String flixbusSerial = formatSerialNumber(record.getBookingNumber());
             String flixbusCash = String.format("%.2f", record.getCash());
             String paymentType = record.getPaymentType();
-            System.out.printf("%-22s | %-19s | %s%n", flixbusSerial, flixbusCash, paymentType);
+            result.append(String.format("%-22s | %-19s | %s%n", flixbusSerial, flixbusCash, paymentType));
         }
+        return result.toString();
     }
 
-    private static void printServiceFeeComparison(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+    private static String printServiceFeeComparison(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+        StringBuilder result = new StringBuilder();
         List<FlixBusRecord> unmatchedFlixbusList = new ArrayList<>();
 
         int maxSize = Math.max(espRecords.size(), flixbusRecords.size());
@@ -126,7 +132,7 @@ public class ComparingFiles {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
                 i--; // Adjust the index after removal
             } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
-             //  System.out.printf("%s | %s | %s | %.2f | %.2f | %s | %s%n", espSerial, flixbusSerial, tripServices, cash, voucher, paymentType, match);
+              // result.append(String.format("%s | %s | %s | %.2f | %.2f | %s | %s%n", espSerial, flixbusSerial, tripServices, cash, voucher, paymentType, match));
             }
         }
 
@@ -134,8 +140,9 @@ public class ComparingFiles {
             String flixbusSerial = formatSerialNumber(record.getBookingNumber());
             String tripServices = record.getTripServices();
             double cash = record.getCash();
-            System.out.printf("%-21s | %-15s | %.2f%n", flixbusSerial, tripServices, cash);
+            result.append(String.format("%-21s | %-15s | %.2f%n", flixbusSerial, tripServices, cash));
         }
+        return result.toString();
     }
 
     private static String formatSerialNumber(String serialNumber) {

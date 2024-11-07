@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileProcessor {
+
     public static List<ESPRecord> readESPFile(String filePath) throws IOException {
         return Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)
                 .skip(1) // Skip header
@@ -57,7 +58,6 @@ public class FileProcessor {
         return false;
     }
 
-
     private static FlixBusRecord parseFlixBusRow(Row row, boolean isFeeFile) {
         String bookingNumber = getCellValue(row.getCell(3));
         String tripServices = getCellValue(row.getCell(10));
@@ -70,7 +70,7 @@ public class FileProcessor {
         String cashStr = getCellValue(row.getCell(14));
         String voucherStr = getCellValue(row.getCell(15));
         String paymentType = getCellValue(row.getCell(7));
-        String com_grossStr= getCellValue(row.getCell(16));
+        String com_grossStr = getCellValue(row.getCell(16));
 
         if ("Cash, Voucher".equals(paymentType) || "Credit card, Voucher".equals(paymentType)) {
             return null; // Skip records with paymentType "Cash, Voucher" or "Credit Card, Voucher"
@@ -80,9 +80,9 @@ public class FileProcessor {
         double voucher = voucherStr.isEmpty() ? 0.0 : Double.parseDouble(voucherStr);
         double com_gross = com_grossStr.isEmpty() ? 0.0 : Double.parseDouble(com_grossStr);
 
-
         return new FlixBusRecord(bookingNumber, tripServices, cash, voucher, paymentType, com_gross);
     }
+
     private static String getCellValue(Cell cell) {
         if (cell == null) {
             return "";
@@ -102,6 +102,16 @@ public class FileProcessor {
                 return cell.getCellFormula();
             default:
                 return "";
+        }
+    }
+
+    public static String determineFileType(String filePath) {
+        if (filePath.endsWith(".csv")) {
+            return "CSV";
+        } else if (filePath.endsWith(".xlsx")) {
+            return "EXCEL";
+        } else {
+            return "UNKNOWN";
         }
     }
 }

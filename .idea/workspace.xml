@@ -5,13 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3fc1cb73-c777-4852-9680-8318ea7f9e7f" name="Changes" comment="List with 2 entries">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ESPRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ESPRecord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/xlsx_files/Booking-report-125295-Own.Solutions---Tobaccoland-API-08-2024-tobaccoland.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/xlsx_files/Booking-report-125295-Own.Solutions---Tobaccoland-API-08-2024-tobaccoland.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/xlsx_files/ESP_Bimedia_Flixbus_weekly_billing_report_20240916.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/xlsx_files/ESP_Bimedia_Flixbus_weekly_billing_report_20240916.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/xlsx_files/Flixbus-Booking-report-129005-Own.Solutions-Bimedia.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/xlsx_files/Flixbus-Booking-report-129005-Own.Solutions-Bimedia.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +59,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "application-jar",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/anton/OneDrive/Documents/GitHub/DifferenceFinder/src/main/java/org/example/xlsx_files",
     "node.js.detected.package.eslint": "true",
@@ -140,6 +142,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="List with 2 entries" />

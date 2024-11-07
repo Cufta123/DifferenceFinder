@@ -1,2 +1,105 @@
-package org.example;public class FileComparatorApp {
+package org.example;
+
+import javafx.application.Application;
+import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+public class FileComparatorApp extends Application {
+
+    private TextField file1PathField;
+    private TextField file2PathField;
+    private TextArea resultArea;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("File Comparator");
+
+        Label file1Label = new Label("CSV file:");
+        file1PathField = new TextField();
+        Button file1Button = new Button("Excel File");
+        file1Button.setOnAction(e -> chooseFile(file1PathField));
+
+        Label file2Label = new Label("File 2:");
+        file2PathField = new TextField();
+        Button file2Button = new Button("Browse...");
+        file2Button.setOnAction(e -> chooseFile(file2PathField));
+
+        Button compareButton = new Button("Compare");
+        compareButton.setOnAction(e -> compareFiles());
+
+        resultArea = new TextArea();
+        resultArea.setEditable(false);
+
+        VBox vbox = new VBox(10, file1Label, file1PathField, file1Button, file2Label, file2PathField, file2Button, compareButton, resultArea);
+        vbox.setPrefSize(500, 500); // Set preferred size for VBox
+        VBox.setVgrow(resultArea, Priority.ALWAYS); // Allow TextArea to grow
+
+        Scene scene = new Scene(vbox, 500, 500); // Increase the size of the Scene
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void chooseFile(TextField textField) {
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            textField.setText(selectedFile.getAbsolutePath());
+        }
+    }
+
+    private void compareFiles() {
+        String file1Path = file1PathField.getText();
+        String file2Path = file2PathField.getText();
+
+        try {
+            List<ESPRecord> espRecords = null;
+            List<FlixBusRecord> flixbusRecords = null;
+            List<FlixBusRecord> flixbusFeeRecords = null;
+
+            String fileType1 = FileProcessor.determineFileType(file1Path);
+            String fileType2 = FileProcessor.determineFileType(file2Path);
+
+            if ("CSV".equals(fileType1)) {
+                espRecords = FileProcessor.readESPFile(file1Path);
+            } else if ("EXCEL".equals(fileType1)) {
+                flixbusRecords = FileProcessor.readFlixbusFile(file1Path);
+                flixbusFeeRecords = FileProcessor.readFlixBusFileFee(file1Path);
+            }
+
+            if ("CSV".equals(fileType2)) {
+                espRecords = FileProcessor.readESPFile(file2Path);
+            } else if ("EXCEL".equals(fileType2)) {
+                flixbusRecords = FileProcessor.readFlixbusFile(file2Path);
+                flixbusFeeRecords = FileProcessor.readFlixBusFileFee(file2Path);
+            }
+
+            if (espRecords != null && flixbusRecords != null && flixbusFeeRecords != null) {
+                String comparisonResult = ComparingFiles.compareFiles(espRecords, flixbusRecords);
+                String serviceFeeResult = ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords);
+
+                resultArea.setText(comparisonResult + "\n" + serviceFeeResult);
+            } else {
+                resultArea.setText("Please provide one CSV file and one Excel file.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resultArea.setText("An error occurred while comparing files.");
+        }
+    }
 }
