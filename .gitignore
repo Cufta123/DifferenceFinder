@@ -37,5 +37,5 @@ build/
 ### Mac OS ###
 .DS_Store
 
-### xlsx_files ###
-/xlsx_files/
+# Ignore the xlsx_files folder
+src/main/java/org/example/xlsx_files/
