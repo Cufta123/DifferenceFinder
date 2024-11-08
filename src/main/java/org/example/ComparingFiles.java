@@ -133,14 +133,14 @@ public class ComparingFiles {
         for (MatchedRecord record : matchedRecordsList) {
             ESPRecord espRecord = record.getEspRecord();
             FlixBusRecord flixBusRecord = record.getFlixBusRecord();
-            String formattedBookingNumber = new java.math.BigDecimal(flixBusRecord.getBookingNumber()).toPlainString();
+            String formattedBookingNumber = formatBookingNumber(flixBusRecord.getBookingNumber());
             String cashEqual = String.format("%.2f", espRecord.getAmount()).equals(String.format("%.2f", flixBusRecord.getCash())) ? "Equal" : "Not Equal";
             result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f | %-10s%n",
                     espRecord.getSerialNumber(), espRecord.getAmount(), formattedBookingNumber, flixBusRecord.getCash(), cashEqual));
         }
         result.append("\nUnmatched FlixBus Records:\n");
         for (FlixBusRecord record : unmatchedFlixbusList) {
-            String formattedBookingNumber = new java.math.BigDecimal(record.getBookingNumber()).toPlainString();
+            String formattedBookingNumber = formatBookingNumber(record.getBookingNumber());
             result.append(String.format("%-20s | %-10.2f%n", formattedBookingNumber, record.getCash()));
         }
         result.append("\nUnmatched ESP Records:\n");
@@ -183,7 +183,13 @@ public class ComparingFiles {
         }
         return result.toString();
     }
-
+    private static String formatBookingNumber(String bookingNumber) {
+        try {
+            return new java.math.BigDecimal(bookingNumber).toPlainString();
+        } catch (NumberFormatException e) {
+            return bookingNumber;
+        }
+    }
     private static String formatSerialNumber(String serialNumber) {
         try {
             return new java.math.BigDecimal(serialNumber).toPlainString();
