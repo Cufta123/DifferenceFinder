@@ -29,16 +29,9 @@ public class ComparingFiles {
             compareRecords(combinedESPList, combinedFlixbusList);
 
             // Matched records list
-            result.append(formatMatchedRecordsList());
-            // Append unmatched records
-            result.append("\nUnmatched FlixBus Records:\n");
-            for (FlixBusRecord record : unmatchedFlixbusList) {
-                result.append(String.format("%-20s | %-10.2f%n", record.getBookingNumber(), record.getCash()));
-            }
-            result.append("\nUnmatched ESP Records:\n");
-            for (ESPRecord record : unmatchedESPList) {
-                result.append(String.format("%-20s | %-10.2f%n", record.getSerialNumber(), record.getAmount()));
-            }
+            result.append(formatRecordsList());
+
+
         } catch (Exception e) {
             logger.severe("An error occurred while comparing files: " + e.getMessage());
             e.printStackTrace();
@@ -113,7 +106,6 @@ public class ComparingFiles {
         unmatchedESPList.clear();
         matchedRecordsList.clear();
 
-
         int maxSize = Math.max(espRecords.size(), flixbusRecords.size());
         for (int i = 0; i < maxSize; i++) {
             String espSerial = i < espRecords.size() ? formatSerialNumber(espRecords.get(i).getSerialNumber()) : "N/A";
@@ -122,6 +114,7 @@ public class ComparingFiles {
             String flixbusCash = i < flixbusRecords.size() ? String.format("%.2f", flixbusRecords.get(i).getCash()) : "N/A";
             String paymentType = i < flixbusRecords.size() ? flixbusRecords.get(i).getPaymentType() : "N/A";
             String match = (espSerial.equals(flixbusSerial) && espAmount.equals(flixbusCash)) ? "Yes" : "No";
+            String cashEqual = espAmount.equals(flixbusCash) ? "Equal" : "Not Equal";
 
             if (!espSerial.equals(flixbusSerial) && i < flixbusRecords.size()) {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
@@ -129,22 +122,30 @@ public class ComparingFiles {
             } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
                 if (match.equals("Yes")) {
                     matchedRecordsList.add(new MatchedRecord(espRecords.get(i), flixbusRecords.get(i)));
-
                 }
             }
         }
     }
-
-    private static String formatMatchedRecordsList() {
+    private static String formatRecordsList() {
         StringBuilder result = new StringBuilder();
         result.append("Matched Records:\n");
-        result.append(String.format("%-20s | %-10s | %-20s | %-10s%n", "ESP Serial", "ESP Amount", "Booking Number", "Cash"));
+        result.append(String.format("%-20s | %-10s | %-20s | %-10s | %-10s%n", "ESP Serial", "ESP Amount", "Booking Number", "Cash", "Cash Equal"));
         for (MatchedRecord record : matchedRecordsList) {
             ESPRecord espRecord = record.getEspRecord();
             FlixBusRecord flixBusRecord = record.getFlixBusRecord();
             String formattedBookingNumber = new java.math.BigDecimal(flixBusRecord.getBookingNumber()).toPlainString();
-            result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
-                    espRecord.getSerialNumber(), espRecord.getAmount(), formattedBookingNumber, flixBusRecord.getCash()));
+            String cashEqual = String.format("%.2f", espRecord.getAmount()).equals(String.format("%.2f", flixBusRecord.getCash())) ? "Equal" : "Not Equal";
+            result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f | %-10s%n",
+                    espRecord.getSerialNumber(), espRecord.getAmount(), formattedBookingNumber, flixBusRecord.getCash(), cashEqual));
+        }
+        result.append("\nUnmatched FlixBus Records:\n");
+        for (FlixBusRecord record : unmatchedFlixbusList) {
+            String formattedBookingNumber = new java.math.BigDecimal(record.getBookingNumber()).toPlainString();
+            result.append(String.format("%-20s | %-10.2f%n", formattedBookingNumber, record.getCash()));
+        }
+        result.append("\nUnmatched ESP Records:\n");
+        for (ESPRecord record : unmatchedESPList) {
+            result.append(String.format("%-20s | %-10.2f%n", record.getSerialNumber(), record.getAmount()));
         }
         return result.toString();
     }
