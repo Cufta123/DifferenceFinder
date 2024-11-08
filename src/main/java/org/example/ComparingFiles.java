@@ -9,6 +9,10 @@ import java.util.logging.Logger;
 
 public class ComparingFiles {
     private static final Logger logger = Logger.getLogger(ComparingFiles.class.getName());
+    private static final List<MatchedRecord> matchedRecordsList = new ArrayList<>();
+    private static final List<FlixBusRecord> unmatchedFlixbusList = new ArrayList<>(); // Declare unmatchedFlixbusList
+    private static final List<ESPRecord> unmatchedESPList = new ArrayList<>(); // Declare unmatchedESPList
+
 
     public static String compareFiles(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
         StringBuilder result = new StringBuilder();
@@ -18,23 +22,42 @@ public class ComparingFiles {
 
             sortRecords(combinedESPList, combinedFlixbusList);
 
-            double espTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getAmount).sum();
-            double suplierMarginTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getSuplierMargin).sum();
-            double flixbusTotalCash = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getCash).sum();
-            double absoluteDifference = Math.abs(espTotalAmount - flixbusTotalCash);
-            double totalComm_gross = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getComm_gross).sum();
-            double commGrossSupplierMarginDiff = Math.abs(totalComm_gross - suplierMarginTotalAmount);
-            result.append(String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f%n" +
-                            "Flixbus summary: %.2f  |   Total Comm_gross: %.3f%n" +
-                            "Difference:      %.2f    |   Difference:       %.3f%n%n",
-                    espTotalAmount, suplierMarginTotalAmount, flixbusTotalCash, totalComm_gross, absoluteDifference, commGrossSupplierMarginDiff));
+            // Generate summary
+            result.append(generateSummary(combinedESPList, combinedFlixbusList));
 
-            result.append(printComparison(combinedESPList, combinedFlixbusList));
+            // Perform matching logic
+            compareRecords(combinedESPList, combinedFlixbusList);
+
+            // Matched records list
+            result.append(formatMatchedRecordsList());
+            // Append unmatched records
+            result.append("\nUnmatched FlixBus Records:\n");
+            for (FlixBusRecord record : unmatchedFlixbusList) {
+                result.append(String.format("%-20s | %-10.2f%n", record.getBookingNumber(), record.getCash()));
+            }
+            result.append("\nUnmatched ESP Records:\n");
+            for (ESPRecord record : unmatchedESPList) {
+                result.append(String.format("%-20s | %-10.2f%n", record.getSerialNumber(), record.getAmount()));
+            }
         } catch (Exception e) {
             logger.severe("An error occurred while comparing files: " + e.getMessage());
             e.printStackTrace();
         }
         return result.toString();
+    }
+
+    private static String generateSummary(List<ESPRecord> combinedESPList, List<FlixBusRecord> combinedFlixbusList) {
+        double espTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getAmount).sum();
+        double suplierMarginTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getSuplierMargin).sum();
+        double flixbusTotalCash = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getCash).sum();
+        double absoluteDifference = Math.abs(espTotalAmount - flixbusTotalCash);
+        double totalComm_gross = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getComm_gross).sum();
+        double commGrossSupplierMarginDiff = Math.abs(totalComm_gross - suplierMarginTotalAmount);
+
+        return String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f%n" +
+                        "Flixbus summary: %.2f  |   Total Comm_gross: %.3f%n" +
+                        "Difference:      %.2f    |   Difference:       %.3f%n%n",
+                espTotalAmount, suplierMarginTotalAmount, flixbusTotalCash, totalComm_gross, absoluteDifference, commGrossSupplierMarginDiff);
     }
 
     public static String printServiceFee(List<ESPRecord> espRecords, List<FlixBusRecord> feeRecords) {
@@ -60,7 +83,7 @@ public class ComparingFiles {
                             existing.getCash() + newRecord.getCash(),
                             existing.getVoucher() + newRecord.getVoucher(), // Sum up voucher
                             existing.getPaymentType(),
-                            existing.getComm_gross()+ newRecord.getComm_gross() // Sum up comm_gross
+                            existing.getComm_gross() + newRecord.getComm_gross() // Sum up comm_gross
                     ));
         }
         return new ArrayList<>(combinedFlixBusRecords.values());
@@ -79,14 +102,17 @@ public class ComparingFiles {
         }
         return new ArrayList<>(combinedESPRecords.values());
     }
+
     private static void sortRecords(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
         espRecords.sort(Comparator.comparing(ESPRecord::getSerialNumber));
         flixbusRecords.sort(Comparator.comparing(FlixBusRecord::getBookingNumber));
     }
 
-    private static String printComparison(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
-        StringBuilder result = new StringBuilder();
-        List<FlixBusRecord> unmatchedFlixbusList = new ArrayList<>();
+    private static void compareRecords(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+        unmatchedFlixbusList.clear();
+        unmatchedESPList.clear();
+        matchedRecordsList.clear();
+
 
         int maxSize = Math.max(espRecords.size(), flixbusRecords.size());
         for (int i = 0; i < maxSize; i++) {
@@ -101,22 +127,31 @@ public class ComparingFiles {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
                 i--; // Adjust the index after removal
             } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
-              //  result.append(String.format("%s | %s | %s | %s | %s | %s%n", espSerial, espAmount, flixbusSerial, flixbusCash, paymentType, match));
+                if (match.equals("Yes")) {
+                    matchedRecordsList.add(new MatchedRecord(espRecords.get(i), flixbusRecords.get(i)));
+
+                }
             }
         }
-        result.append(String.format("%-20s  | %-18s  | %-11s%n", "Booking number", "Cash", "Payment type"));
-        for (FlixBusRecord record : unmatchedFlixbusList) {
-            String flixbusSerial = formatSerialNumber(record.getBookingNumber());
-            String flixbusCash = String.format("%.2f", record.getCash());
-            String paymentType = record.getPaymentType();
-            result.append(String.format("%-22s | %-19s | %s%n", flixbusSerial, flixbusCash, paymentType));
+    }
+
+    private static String formatMatchedRecordsList() {
+        StringBuilder result = new StringBuilder();
+        result.append("Matched Records:\n");
+        result.append(String.format("%-20s | %-10s | %-20s | %-10s%n", "ESP Serial", "ESP Amount", "Booking Number", "Cash"));
+        for (MatchedRecord record : matchedRecordsList) {
+            ESPRecord espRecord = record.getEspRecord();
+            FlixBusRecord flixBusRecord = record.getFlixBusRecord();
+            String formattedBookingNumber = new java.math.BigDecimal(flixBusRecord.getBookingNumber()).toPlainString();
+            result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
+                    espRecord.getSerialNumber(), espRecord.getAmount(), formattedBookingNumber, flixBusRecord.getCash()));
         }
         return result.toString();
     }
-
     private static String printServiceFeeComparison(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
         StringBuilder result = new StringBuilder();
         List<FlixBusRecord> unmatchedFlixbusList = new ArrayList<>();
+        matchedRecordsList.clear();
 
         int maxSize = Math.max(espRecords.size(), flixbusRecords.size());
         for (int i = 0; i < maxSize; i++) {
@@ -132,7 +167,10 @@ public class ComparingFiles {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
                 i--; // Adjust the index after removal
             } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
-              // result.append(String.format("%s | %s | %s | %.2f | %.2f | %s | %s%n", espSerial, flixbusSerial, tripServices, cash, voucher, paymentType, match));
+                if (match.equals("Yes")) {
+                    matchedRecordsList.add(new MatchedRecord(espRecords.get(i), flixbusRecords.get(i)));
+                }
+                result.append(String.format("%s | %s | %s | %.2f | %.2f | %s | %s%n", espSerial, flixbusSerial, tripServices, cash, voucher, paymentType, match));
             }
         }
 
