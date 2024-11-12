@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3fc1cb73-c777-4852-9680-8318ea7f9e7f" name="Changes" comment="List with 2 entries">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/Record.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FeeRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FeeRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FlixBusRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FlixBusRecord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MatchedRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/MatchedRecord.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +24,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {

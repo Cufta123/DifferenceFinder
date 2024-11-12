@@ -2,18 +2,18 @@ package org.example;
 
 public class MatchedRecord {
     private ESPRecord espRecord;
-    private FlixBusRecord flixBusRecord;
+    private Record record;
 
-    public MatchedRecord(ESPRecord espRecord, FlixBusRecord flixBusRecord) {
+    public MatchedRecord(ESPRecord espRecord, Record record) {
         this.espRecord = espRecord;
-        this.flixBusRecord = flixBusRecord;
+        this.record = record;
     }
 
     public ESPRecord getEspRecord() {
         return espRecord;
     }
 
-    public FlixBusRecord getFlixBusRecord() {
-        return flixBusRecord;
+    public Record getRecord() {
+        return record;
     }
 }
