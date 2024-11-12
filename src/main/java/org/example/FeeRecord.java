@@ -1,8 +1,8 @@
 package org.example;
 
 public class FeeRecord implements Record {
-    private String bookingNumber;
-    private double feeAmount;
+    private final String bookingNumber;
+    private final double feeAmount;
 
     public FeeRecord(String serialNumber, double feeAmount) {
         this.bookingNumber = serialNumber;
@@ -14,7 +14,7 @@ public class FeeRecord implements Record {
     }
 
     @Override
-    public String getBookingNumber() {
+    public String bookingNumber() {
         return bookingNumber;
     }
 }
