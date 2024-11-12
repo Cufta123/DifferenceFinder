@@ -57,7 +57,6 @@ public class ComparingFiles {
     }
 
 
-
     private static List<FlixBusRecord> combineFlixBusRecords(List<Record> flixbusRecords) {
         Map<String, FlixBusRecord> combinedFlixBusRecords = new HashMap<>();
         for (Record record : flixbusRecords) {
@@ -166,6 +165,7 @@ public class ComparingFiles {
         }
         return result.toString();
     }
+
     public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords) {
         StringBuilder result = new StringBuilder();
 

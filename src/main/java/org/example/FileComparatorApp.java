@@ -1,15 +1,15 @@
 package org.example;
 
 import javafx.application.Application;
-import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +29,9 @@ public class FileComparatorApp extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("File Comparator");
 
-        Label file1Label = new Label("CSV file:");
+        Label file1Label = new Label("File 1:");
         file1PathField = new TextField();
-        Button file1Button = new Button("Excel File");
+        Button file1Button = new Button("Browse...");
         file1Button.setOnAction(e -> chooseFile(file1PathField));
 
         Label file2Label = new Label("File 2:");
@@ -49,7 +49,7 @@ public class FileComparatorApp extends Application {
         vbox.setPrefSize(500, 500); // Set preferred size for VBox
         VBox.setVgrow(resultArea, Priority.ALWAYS); // Allow TextArea to grow
 
-        Scene scene = new Scene(vbox, 500, 500); // Increase the size of the Scene
+        Scene scene = new Scene(vbox, 550, 550); // Increase the size of the Scene
 
         primaryStage.setScene(scene);
         primaryStage.show();
