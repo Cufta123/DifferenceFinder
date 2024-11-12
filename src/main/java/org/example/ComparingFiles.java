@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Comparator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ComparingFiles {
@@ -18,7 +19,7 @@ public class ComparingFiles {
         try {
             List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
             List<FlixBusRecord> combinedFlixbusList = combineFlixBusRecords(flixbusRecords);
-            List<FeeRecord> combinedFlixBusFeeRecords = combineFlixBusFeeRecords(flixbusRecords);
+            List<FeeRecord> combinedFlixBusFeeRecords = combineFlixBusFeeRecords(feeRecords);
 
             sortRecords(combinedESPList, combinedFlixbusList);
 
@@ -34,7 +35,7 @@ public class ComparingFiles {
 
         } catch (Exception e) {
             logger.severe("An error occurred while comparing files: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Exception: ", e);
         }
         return result.toString();
     }
@@ -47,25 +48,15 @@ public class ComparingFiles {
         double totalComm_gross = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getComm_gross).sum();
         double commGrossSupplierMarginDiff = Math.abs(totalComm_gross - suplierMarginTotalAmount);
         double combinedESPListTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getTotalAmount).sum();
-        double combinedFlixBusListTotalAmount = getFlixBusTotalAmount(combinedFlixbusList,combinedFlixBusFeeRecords);
-       double TotalAmountDifference = Math.abs(combinedESPListTotalAmount - combinedFlixBusListTotalAmount);
+        double combinedFlixBusListTotalAmount = getFlixBusTotalAmount(combinedFlixbusList, combinedFlixBusFeeRecords);
+        double TotalAmountDifference = Math.abs(combinedESPListTotalAmount - combinedFlixBusListTotalAmount);
         return String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f  |   ESP Total Amount: %.2f%n" +
                         "Flixbus summary: %.2f  |   Total Comm_gross: %.3f |  Flixbus Total Amount: %.2f%n" +
                         "Difference:      %.2f    |   Difference:       %.3f  |   Difference: %.2f%n",
-                espTotalAmount, suplierMarginTotalAmount,combinedESPListTotalAmount, flixbusTotalCash, totalComm_gross,combinedFlixBusListTotalAmount ,absoluteDifference, commGrossSupplierMarginDiff,TotalAmountDifference);
+                espTotalAmount, suplierMarginTotalAmount, combinedESPListTotalAmount, flixbusTotalCash, totalComm_gross, combinedFlixBusListTotalAmount, absoluteDifference, commGrossSupplierMarginDiff, TotalAmountDifference);
     }
-    public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords) {
-        StringBuilder result = new StringBuilder();
-        result.append(String.format("%n%-20s | %-15s | %-10s%n", "FlixBus Booking Number", "Trip Services", "Cash"));
 
-        List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
-        List<FeeRecord> combinedFeeList = combineFlixBusFeeRecords(feeRecords);
 
-        sortRecords(combinedESPList, combinedFeeList);
-
-        result.append(printServiceFeeComparison(combinedESPList, combinedFeeList));
-        return result.toString();
-    }
 
     private static List<FlixBusRecord> combineFlixBusRecords(List<Record> flixbusRecords) {
         Map<String, FlixBusRecord> combinedFlixBusRecords = new HashMap<>();
@@ -86,11 +77,13 @@ public class ComparingFiles {
         }
         return new ArrayList<>(combinedFlixBusRecords.values());
     }
+
     public static double getFlixBusTotalAmount(List<FlixBusRecord> flixbusRecords, List<FeeRecord> feeRecords) {
         return flixbusRecords.stream().mapToDouble(FlixBusRecord::getTotalAmount).sum()
                 + feeRecords.stream().mapToDouble(FeeRecord::getFeeAmount).sum();
     }
-    private static List<FeeRecord> combineFlixBusFeeRecords(List<Record> feeRecords){
+
+    private static List<FeeRecord> combineFlixBusFeeRecords(List<Record> feeRecords) {
         Map<String, FeeRecord> combinedFlixBusFeeRecords = new HashMap<>();
         for (Record record : feeRecords) {
             if (record instanceof FeeRecord feeRecord) {
@@ -135,7 +128,6 @@ public class ComparingFiles {
             String espAmount = i < espRecords.size() ? String.format("%.2f", espRecords.get(i).getAmount()) : "N/A";
             String flixbusSerial = i < flixbusRecords.size() ? formatSerialNumber(flixbusRecords.get(i).getBookingNumber()) : "N/A";
             String flixbusCash = i < flixbusRecords.size() ? String.format("%.2f", flixbusRecords.get(i).getCash()) : "N/A";
-            String paymentType = i < flixbusRecords.size() ? flixbusRecords.get(i).getPaymentType() : "N/A";
             String match = (espSerial.equals(flixbusSerial) && espAmount.equals(flixbusCash)) ? "Yes" : "No";
 
 
@@ -150,6 +142,7 @@ public class ComparingFiles {
         }
     }
 
+
     private static String formatRecordsList() {
         StringBuilder result = new StringBuilder();
         result.append("Matched Records:\n");
@@ -157,14 +150,14 @@ public class ComparingFiles {
         for (MatchedRecord record : matchedRecordsList) {
             ESPRecord espRecord = record.getEspRecord();
             FlixBusRecord flixBusRecord = (FlixBusRecord) record.getRecord();
-            String formattedBookingNumber = new java.math.BigDecimal(flixBusRecord.getBookingNumber()).toPlainString();
+            String formattedBookingNumber = formatSerialNumber(flixBusRecord.getBookingNumber());
             String cashEqual = String.format("%.2f", espRecord.getAmount()).equals(String.format("%.2f", flixBusRecord.getCash())) ? "Equal" : "Not Equal";
             result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f | %-10s%n",
                     espRecord.getSerialNumber(), espRecord.getAmount(), formattedBookingNumber, flixBusRecord.getCash(), cashEqual));
         }
         result.append("\nUnmatched FlixBus Records:\n");
         for (FlixBusRecord record : unmatchedFlixbusList) {
-            String formattedBookingNumber = new java.math.BigDecimal(record.getBookingNumber()).toPlainString();
+            String formattedBookingNumber = formatSerialNumber(record.getBookingNumber());
             result.append(String.format("%-20s | %-10.2f%n", formattedBookingNumber, record.getCash()));
         }
         result.append("\nUnmatched ESP Records:\n");
@@ -173,27 +166,41 @@ public class ComparingFiles {
         }
         return result.toString();
     }
-
-    private static String printServiceFeeComparison(List<ESPRecord> espRecords, List<FeeRecord> feeRecords) {
+    public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords) {
         StringBuilder result = new StringBuilder();
+
+        List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
+        List<FeeRecord> combinedFeeList = combineFlixBusFeeRecords(feeRecords);
+
+        sortRecords(combinedESPList, combinedFeeList);
+
         List<FeeRecord> unmatchedFeeList = new ArrayList<>();
         List<MatchedRecord> matchedFeeRecordsList = new ArrayList<>();
 
-        int maxSize = Math.max(espRecords.size(), feeRecords.size());
+        int maxSize = Math.max(combinedESPList.size(), combinedFeeList.size());
         for (int i = 0; i < maxSize; i++) {
-            String espSerial = i < espRecords.size() ? formatSerialNumber(espRecords.get(i).getSerialNumber()) : "N/A";
-            String feeSerial = i < feeRecords.size() ? formatSerialNumber(feeRecords.get(i).getBookingNumber()) : "N/A";
+            String espSerial = i < combinedESPList.size() ? formatSerialNumber(combinedESPList.get(i).getSerialNumber()) : "N/A";
+            String feeSerial = i < combinedFeeList.size() ? formatSerialNumber(combinedFeeList.get(i).getBookingNumber()) : "N/A";
             String match = espSerial.equals(feeSerial) ? "Yes" : "No";
 
-            if (!espSerial.equals(feeSerial) && i < feeRecords.size()) {
-                unmatchedFeeList.add(feeRecords.remove(i));
-                i--; // Adjust the index after removal
-            } else if (!espSerial.equals("N/A") || !feeSerial.equals("N/A")) {
-                if (match.equals("Yes")) {
-                    matchedFeeRecordsList.add(new MatchedRecord(espRecords.get(i), feeRecords.get(i)));
+            if (espSerial.equals(feeSerial) || i >= combinedFeeList.size()) {
+                if (!espSerial.equals("N/A") || !feeSerial.equals("N/A")) {
+                    if (match.equals("Yes")) {
+                        matchedFeeRecordsList.add(new MatchedRecord(combinedESPList.get(i), combinedFeeList.get(i)));
+                    }
                 }
-                result.append(String.format("%s | %s | %s%n", espSerial, feeSerial, match));
+            } else {
+                unmatchedFeeList.add(combinedFeeList.remove(i));
+                i--; // Adjust the index after removal
             }
+        }
+
+        result.append("\nMatched Fee Records:\n");
+        for (MatchedRecord record : matchedFeeRecordsList) {
+            ESPRecord espRecord = record.getEspRecord();
+            FeeRecord feeRecord = (FeeRecord) record.getRecord();
+            result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
+                    espRecord.getSerialNumber(), espRecord.getServiceFee(), feeRecord.getBookingNumber(), feeRecord.getFeeAmount()));
         }
 
         result.append("\nUnmatched Fee Records:\n");
@@ -202,10 +209,14 @@ public class ComparingFiles {
             double feeAmount = record.getFeeAmount();
             result.append(String.format("%-21s | %.2f%n", feeSerial, feeAmount));
         }
+
         return result.toString();
     }
 
     private static String formatSerialNumber(String serialNumber) {
+        if (serialNumber == null || serialNumber.isEmpty()) {
+            return "N/A";
+        }
         try {
             return new java.math.BigDecimal(serialNumber).toPlainString();
         } catch (NumberFormatException e) {

@@ -11,18 +11,23 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileProcessor {
 
     public static List<ESPRecord> readESPFile(String filePath) throws IOException {
-        return Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)
-                .skip(1) // Skip header
-                .map(line -> line.split(";")) // Split by semicolon
-                .filter(parts -> parts.length >= 13) // Ensure there are at least 13 columns
-                .map(parts -> new ESPRecord(parts[5], Double.parseDouble(parts[11]), Double.parseDouble(parts[17]), Double.parseDouble(parts[16])))
-                .collect(Collectors.toList());
+        try (Stream<String> lines = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
+            return lines
+                    .skip(1) // Skip header
+                    .map(line -> line.split(";")) // Split by semicolon
+                    .filter(parts -> parts.length > 17) // Ensure there are more than 17 columns
+                    .map(parts -> {
+                        double value = parts.length > 20 ? Double.parseDouble(parts[20]) : Double.parseDouble(parts[17]);
+                        return new ESPRecord(parts[5], Double.parseDouble(parts[11]), value, Double.parseDouble(parts[16]));
+                    })
+                    .collect(Collectors.toList());
+        }
     }
-
 
 
     static List<Record> readFlixBusFile(String filePath) throws IOException {
@@ -55,8 +60,7 @@ public class FileProcessor {
     private static Record parseFlixBusRow(Row row) {
         String bookingNumber = getCellValue(row.getCell(3));
         String tripServices = getCellValue(row.getCell(10));
-        double totalAmount = Double.parseDouble(getCellValue(row.getCell(14)));
-
+        String totalAmountStr = getCellValue(row.getCell(14));
         String cashStr = getCellValue(row.getCell(14));
         String voucherStr = getCellValue(row.getCell(15));
         String paymentType = getCellValue(row.getCell(7));
@@ -66,6 +70,7 @@ public class FileProcessor {
             return null; // Skip records with paymentType "Cash, Voucher" or "Credit Card, Voucher"
         }
 
+        double totalAmount = totalAmountStr.isEmpty() ? 0.0 : Double.parseDouble(totalAmountStr);
         double cash = cashStr.isEmpty() ? 0.0 : Double.parseDouble(cashStr);
         double voucher = voucherStr.isEmpty() ? 0.0 : Double.parseDouble(voucherStr);
         double comGross = comGrossStr.isEmpty() ? 0.0 : Double.parseDouble(comGrossStr);
