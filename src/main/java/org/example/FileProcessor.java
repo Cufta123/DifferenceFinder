@@ -23,16 +23,10 @@ public class FileProcessor {
                 .collect(Collectors.toList());
     }
 
-    public static List<FlixBusRecord> readFlixBusFileFee(String filePath) throws IOException {
-        return readFlixBusFile(filePath, true);
-    }
 
-    public static List<FlixBusRecord> readFlixbusFile(String filePath) throws IOException {
-        return readFlixBusFile(filePath, false);
-    }
 
-    private static List<FlixBusRecord> readFlixBusFile(String filePath, boolean isFeeFile) throws IOException {
-        List<FlixBusRecord> records = new ArrayList<>();
+    static List<Record> readFlixBusFile(String filePath) throws IOException {
+        List<Record> records = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream(filePath);
              Workbook workbook = new XSSFWorkbook(fis)) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -40,7 +34,7 @@ public class FileProcessor {
                 if (row.getRowNum() == 0 || containsTotal(row)) { // Skip header and total rows
                     continue;
                 }
-                FlixBusRecord record = parseFlixBusRow(row, isFeeFile);
+                Record record = parseFlixBusRow(row);
                 if (record != null) {
                     records.add(record);
                 }
@@ -58,19 +52,15 @@ public class FileProcessor {
         return false;
     }
 
-    private static FlixBusRecord parseFlixBusRow(Row row, boolean isFeeFile) {
+    private static Record parseFlixBusRow(Row row) {
         String bookingNumber = getCellValue(row.getCell(3));
         String tripServices = getCellValue(row.getCell(10));
-        if (isFeeFile && !"PlatformFee".equals(tripServices)) {
-            return null; // Skip non-fee records in fee file
-        }
-        if (!isFeeFile && "PlatformFee".equals(tripServices)) {
-            return null; // Skip fee records in non-fee file
-        }
+        double totalAmount = Double.parseDouble(getCellValue(row.getCell(14)));
+
         String cashStr = getCellValue(row.getCell(14));
         String voucherStr = getCellValue(row.getCell(15));
         String paymentType = getCellValue(row.getCell(7));
-        String com_grossStr = getCellValue(row.getCell(16));
+        String comGrossStr = getCellValue(row.getCell(16));
 
         if ("Cash, Voucher".equals(paymentType) || "Credit card, Voucher".equals(paymentType)) {
             return null; // Skip records with paymentType "Cash, Voucher" or "Credit Card, Voucher"
@@ -78,9 +68,13 @@ public class FileProcessor {
 
         double cash = cashStr.isEmpty() ? 0.0 : Double.parseDouble(cashStr);
         double voucher = voucherStr.isEmpty() ? 0.0 : Double.parseDouble(voucherStr);
-        double com_gross = com_grossStr.isEmpty() ? 0.0 : Double.parseDouble(com_grossStr);
+        double comGross = comGrossStr.isEmpty() ? 0.0 : Double.parseDouble(comGrossStr);
 
-        return new FlixBusRecord(bookingNumber, tripServices, cash, voucher, paymentType, com_gross);
+        if ("PlatformFee".equals(tripServices)) {
+            return new FeeRecord(bookingNumber, cash);
+        } else {
+            return new FlixBusRecord(bookingNumber, tripServices, cash, voucher, paymentType, comGross, totalAmount);
+        }
     }
 
     private static String getCellValue(Cell cell) {

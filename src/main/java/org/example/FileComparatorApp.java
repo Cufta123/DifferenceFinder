@@ -69,8 +69,8 @@ public class FileComparatorApp extends Application {
 
         try {
             List<ESPRecord> espRecords = null;
-            List<FlixBusRecord> flixbusRecords = null;
-            List<FlixBusRecord> flixbusFeeRecords = null;
+            List<Record> flixbusRecords = null;
+            List<Record> flixbusFeeRecords = null;
 
             String fileType1 = FileProcessor.determineFileType(file1Path);
             String fileType2 = FileProcessor.determineFileType(file2Path);
@@ -78,21 +78,20 @@ public class FileComparatorApp extends Application {
             if ("CSV".equals(fileType1)) {
                 espRecords = FileProcessor.readESPFile(file1Path);
             } else if ("EXCEL".equals(fileType1)) {
-                flixbusRecords = FileProcessor.readFlixbusFile(file1Path);
-                flixbusFeeRecords = FileProcessor.readFlixBusFileFee(file1Path);
+                flixbusRecords = FileProcessor.readFlixBusFile(file1Path);
+                flixbusFeeRecords = FileProcessor.readFlixBusFile(file1Path);
             }
 
             if ("CSV".equals(fileType2)) {
                 espRecords = FileProcessor.readESPFile(file2Path);
             } else if ("EXCEL".equals(fileType2)) {
-                flixbusRecords = FileProcessor.readFlixbusFile(file2Path);
-                flixbusFeeRecords = FileProcessor.readFlixBusFileFee(file2Path);
+                flixbusRecords = FileProcessor.readFlixBusFile(file2Path);
+                flixbusFeeRecords = FileProcessor.readFlixBusFile(file2Path);
             }
 
-            if (espRecords != null && flixbusRecords != null && flixbusFeeRecords != null) {
-                String comparisonResult = ComparingFiles.compareFiles(espRecords, flixbusRecords);
+            if (espRecords != null && flixbusRecords != null) {
+                String comparisonResult = ComparingFiles.compareFiles(espRecords, flixbusRecords, flixbusFeeRecords);
                 String serviceFeeResult = ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords);
-
                 resultArea.setText(comparisonResult + "\n" + serviceFeeResult);
             } else {
                 resultArea.setText("Please provide one CSV file and one Excel file.");

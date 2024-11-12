@@ -14,16 +14,17 @@ public class ComparingFiles {
     private static final List<ESPRecord> unmatchedESPList = new ArrayList<>(); // Declare unmatchedESPList
 
 
-    public static String compareFiles(List<ESPRecord> espRecords, List<FlixBusRecord> flixbusRecords) {
+    public static String compareFiles(List<ESPRecord> espRecords, List<Record> flixbusRecords, List<Record> feeRecords) {
         StringBuilder result = new StringBuilder();
         try {
             List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
             List<FlixBusRecord> combinedFlixbusList = combineFlixBusRecords(flixbusRecords);
+            List<FeeRecord> combinedFlixBusFeeRecords = combineFlixBusFeeRecords(flixbusRecords);
 
             sortRecords(combinedESPList, combinedFlixbusList);
 
             // Generate summary
-            result.append(generateSummary(combinedESPList, combinedFlixbusList));
+            result.append(generateSummary(combinedESPList, combinedFlixbusList, combinedFlixBusFeeRecords));
 
             // Perform matching logic
             compareRecords(combinedESPList, combinedFlixbusList);
@@ -39,21 +40,22 @@ public class ComparingFiles {
         return result.toString();
     }
 
-    private static String generateSummary(List<ESPRecord> combinedESPList, List<FlixBusRecord> combinedFlixbusList) {
+    private static String generateSummary(List<ESPRecord> combinedESPList, List<FlixBusRecord> combinedFlixbusList, List<FeeRecord> combinedFlixBusFeeRecords) {
         double espTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getAmount).sum();
         double suplierMarginTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getSuplierMargin).sum();
         double flixbusTotalCash = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getCash).sum();
         double absoluteDifference = Math.abs(espTotalAmount - flixbusTotalCash);
         double totalComm_gross = combinedFlixbusList.stream().mapToDouble(FlixBusRecord::getComm_gross).sum();
         double commGrossSupplierMarginDiff = Math.abs(totalComm_gross - suplierMarginTotalAmount);
-
-        return String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f%n" +
-                        "Flixbus summary: %.2f  |   Total Comm_gross: %.3f%n" +
-                        "Difference:      %.2f    |   Difference:       %.3f%n%n",
-                espTotalAmount, suplierMarginTotalAmount, flixbusTotalCash, totalComm_gross, absoluteDifference, commGrossSupplierMarginDiff);
+        double combinedESPListTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getTotalAmount).sum();
+        double combinedFlixBusListTotalAmount = getFlixBusTotalAmount(combinedFlixbusList,combinedFlixBusFeeRecords);
+       double TotalAmountDifference = Math.abs(combinedESPListTotalAmount - combinedFlixBusListTotalAmount);
+        return String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f  |   ESP Total Amount: %.2f%n" +
+                        "Flixbus summary: %.2f  |   Total Comm_gross: %.3f |  Flixbus Total Amount: %.2f%n" +
+                        "Difference:      %.2f    |   Difference:       %.3f  |   Difference: %.2f%n",
+                espTotalAmount, suplierMarginTotalAmount,combinedESPListTotalAmount, flixbusTotalCash, totalComm_gross,combinedFlixBusListTotalAmount ,absoluteDifference, commGrossSupplierMarginDiff,TotalAmountDifference);
     }
-
-    public static String printServiceFee(List<ESPRecord> espRecords, List<FlixBusRecord> feeRecords) {
+    public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords) {
         StringBuilder result = new StringBuilder();
         result.append(String.format("%n%-20s | %-15s | %-10s%n", "FlixBus Booking Number", "Trip Services", "Cash"));
 
@@ -66,21 +68,43 @@ public class ComparingFiles {
         return result.toString();
     }
 
-    private static List<FlixBusRecord> combineFlixBusRecords(List<FlixBusRecord> flixbusRecords) {
+    private static List<FlixBusRecord> combineFlixBusRecords(List<Record> flixbusRecords) {
         Map<String, FlixBusRecord> combinedFlixBusRecords = new HashMap<>();
-        for (FlixBusRecord record : flixbusRecords) {
-            combinedFlixBusRecords.merge(record.getBookingNumber(), record, (existing, newRecord) ->
-                    new FlixBusRecord(
-                            existing.getBookingNumber(),
-                            existing.getTripServices(),
-                            existing.getCash() + newRecord.getCash(),
-                            existing.getVoucher() + newRecord.getVoucher(), // Sum up voucher
-                            existing.getPaymentType(),
-                            existing.getComm_gross() + newRecord.getComm_gross() // Sum up comm_gross
-                    ));
+        for (Record record : flixbusRecords) {
+            if (record instanceof FlixBusRecord flixBusRecord) {
+                combinedFlixBusRecords.merge(flixBusRecord.getBookingNumber(), flixBusRecord, (existing, newRecord) ->
+                        new FlixBusRecord(
+                                existing.getBookingNumber(),
+                                existing.getTripServices(),
+                                existing.getCash() + newRecord.getCash(),
+                                existing.getVoucher() + newRecord.getVoucher(), // Sum up voucher
+                                existing.getPaymentType(),
+                                existing.getComm_gross() + newRecord.getComm_gross(), // Sum up comm_gross
+                                existing.getTotalAmount() + newRecord.getTotalAmount()
+                        ));
+            }
+
         }
         return new ArrayList<>(combinedFlixBusRecords.values());
     }
+    public static double getFlixBusTotalAmount(List<FlixBusRecord> flixbusRecords, List<FeeRecord> feeRecords) {
+        return flixbusRecords.stream().mapToDouble(FlixBusRecord::getTotalAmount).sum()
+                + feeRecords.stream().mapToDouble(FeeRecord::getFeeAmount).sum();
+    }
+    private static List<FeeRecord> combineFlixBusFeeRecords(List<Record> feeRecords){
+        Map<String, FeeRecord> combinedFlixBusFeeRecords = new HashMap<>();
+        for (Record record : feeRecords) {
+            if (record instanceof FeeRecord feeRecord) {
+                combinedFlixBusFeeRecords.merge(feeRecord.getBookingNumber(), feeRecord, (existing, newRecord) ->
+                        new FeeRecord(
+                                existing.getBookingNumber(),
+                                existing.getFeeAmount() + newRecord.getFeeAmount()
+                        ));
+            }
+        }
+        return new ArrayList<>(combinedFlixBusFeeRecords.values());
+    }
+
 
     private static List<ESPRecord> combineESPRecords(List<ESPRecord> espRecords) {
         Map<String, ESPRecord> combinedESPRecords = new HashMap<>();
@@ -114,7 +138,7 @@ public class ComparingFiles {
             String flixbusCash = i < flixbusRecords.size() ? String.format("%.2f", flixbusRecords.get(i).getCash()) : "N/A";
             String paymentType = i < flixbusRecords.size() ? flixbusRecords.get(i).getPaymentType() : "N/A";
             String match = (espSerial.equals(flixbusSerial) && espAmount.equals(flixbusCash)) ? "Yes" : "No";
-            String cashEqual = espAmount.equals(flixbusCash) ? "Equal" : "Not Equal";
+
 
             if (!espSerial.equals(flixbusSerial) && i < flixbusRecords.size()) {
                 unmatchedFlixbusList.add(flixbusRecords.remove(i));
@@ -126,17 +150,18 @@ public class ComparingFiles {
             }
         }
     }
+
     private static String formatRecordsList() {
         StringBuilder result = new StringBuilder();
         result.append("Matched Records:\n");
-        result.append(String.format("%-20s | %-10s | %-20s | %-10s | %-10s%n", "ESP Serial", "ESP Amount", "Booking Number", "Cash", "Cash Equal"));
+        result.append(String.format("%-20s | %-10s | %-20s|%-20s | %-10s | %-10s%n", "ESP Serial", "ESP Amount","Total Amount", "Booking Number", "Cash", "Cash Equal"));
         for (MatchedRecord record : matchedRecordsList) {
             ESPRecord espRecord = record.getEspRecord();
             FlixBusRecord flixBusRecord = record.getFlixBusRecord();
             String formattedBookingNumber = new java.math.BigDecimal(flixBusRecord.getBookingNumber()).toPlainString();
             String cashEqual = String.format("%.2f", espRecord.getAmount()).equals(String.format("%.2f", flixBusRecord.getCash())) ? "Equal" : "Not Equal";
-            result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f | %-10s%n",
-                    espRecord.getSerialNumber(), espRecord.getAmount(), formattedBookingNumber, flixBusRecord.getCash(), cashEqual));
+            result.append(String.format("%-20s | %-10.2f | %-20.2f |%-20s| %-10.2f | %-10s%n",
+                    espRecord.getSerialNumber(), espRecord.getAmount(),espRecord.getTotalAmount() ,formattedBookingNumber, flixBusRecord.getCash(), cashEqual));
         }
         result.append("\nUnmatched FlixBus Records:\n");
         for (FlixBusRecord record : unmatchedFlixbusList) {
