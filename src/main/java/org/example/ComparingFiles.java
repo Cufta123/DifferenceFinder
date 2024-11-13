@@ -121,24 +121,24 @@ public class ComparingFiles {
         unmatchedESPList.clear();
         matchedRecordsList.clear();
 
-        int maxSize = Math.max(espRecords.size(), flixbusRecords.size());
-        for (int i = 0; i < maxSize; i++) {
-            String espSerial = i < espRecords.size() ? formatSerialNumber(espRecords.get(i).serialNumber()) : "N/A";
-            String espAmount = i < espRecords.size() ? String.format("%.2f", espRecords.get(i).amount()) : "N/A";
-            String flixbusSerial = i < flixbusRecords.size() ? formatSerialNumber(flixbusRecords.get(i).bookingNumber()) : "N/A";
-            String flixbusCash = i < flixbusRecords.size() ? String.format("%.2f", flixbusRecords.get(i).cash()) : "N/A";
-            String match = (espSerial.equals(flixbusSerial) && espAmount.equals(flixbusCash)) ? "Yes" : "No";
+        Map<String, ESPRecord> espRecordMap = new HashMap<>();
+        for (ESPRecord espRecord : espRecords) {
+            espRecordMap.put(formatSerialNumber(espRecord.serialNumber()), espRecord);
+        }
 
+        for (FlixBusRecord flixbusRecord : flixbusRecords) {
+            String flixbusSerial = formatSerialNumber(flixbusRecord.bookingNumber());
+            ESPRecord matchedESPRecord = espRecordMap.get(flixbusSerial);
 
-            if (!espSerial.equals(flixbusSerial) && i < flixbusRecords.size()) {
-                unmatchedFlixbusList.add(flixbusRecords.remove(i));
-                i--; // Adjust the index after removal
-            } else if (!espSerial.equals("N/A") || !flixbusSerial.equals("N/A")) {
-                if (match.equals("Yes")) {
-                    matchedRecordsList.add(new MatchedRecord(espRecords.get(i), flixbusRecords.get(i)));
-                }
+            if (matchedESPRecord != null) {
+                matchedRecordsList.add(new MatchedRecord(matchedESPRecord, flixbusRecord));
+                espRecordMap.remove(flixbusSerial);
+            } else {
+                unmatchedFlixbusList.add(flixbusRecord);
             }
         }
+
+        unmatchedESPList.addAll(espRecordMap.values());
     }
 
 
@@ -177,23 +177,23 @@ public class ComparingFiles {
         List<FeeRecord> unmatchedFeeList = new ArrayList<>();
         List<MatchedRecord> matchedFeeRecordsList = new ArrayList<>();
 
-        int maxSize = Math.max(combinedESPList.size(), combinedFeeList.size());
-        for (int i = 0; i < maxSize; i++) {
-            String espSerial = i < combinedESPList.size() ? formatSerialNumber(combinedESPList.get(i).serialNumber()) : "N/A";
-            String feeSerial = i < combinedFeeList.size() ? formatSerialNumber(combinedFeeList.get(i).bookingNumber()) : "N/A";
-            String match = espSerial.equals(feeSerial) ? "Yes" : "No";
+        Map<String, ESPRecord> espRecordMap = new HashMap<>();
+        for (ESPRecord espRecord : combinedESPList) {
+            espRecordMap.put(formatSerialNumber(espRecord.serialNumber()), espRecord);
+        }
 
-            if (espSerial.equals(feeSerial) || i >= combinedFeeList.size()) {
-                if (!espSerial.equals("N/A") || !feeSerial.equals("N/A")) {
-                    if (match.equals("Yes")) {
-                        matchedFeeRecordsList.add(new MatchedRecord(combinedESPList.get(i), combinedFeeList.get(i)));
-                    }
-                }
+        for (FeeRecord feeRecord : combinedFeeList) {
+            String feeSerial = formatSerialNumber(feeRecord.bookingNumber());
+            ESPRecord matchedESPRecord = espRecordMap.get(feeSerial);
+
+            if (matchedESPRecord != null) {
+                matchedFeeRecordsList.add(new MatchedRecord(matchedESPRecord, feeRecord));
+                espRecordMap.remove(feeSerial);
             } else {
-                unmatchedFeeList.add(combinedFeeList.remove(i));
-                i--; // Adjust the index after removal
+                unmatchedFeeList.add(feeRecord);
             }
         }
+
 
         result.append("\nMatched Fee Records:\n");
         for (MatchedRecord record : matchedFeeRecordsList) {
