@@ -14,8 +14,11 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileComparatorApp extends Application {
+    private static final Logger logger = Logger.getLogger(FileComparatorApp.class.getName());
 
     private TextField file1PathField;
     private TextField file2PathField;
@@ -97,7 +100,7 @@ public class FileComparatorApp extends Application {
                 resultArea.setText("Please provide one CSV file and one Excel file.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "An error occurred while comparing files.", e);
             resultArea.setText("An error occurred while comparing files.");
         }
     }
