@@ -97,7 +97,7 @@ public class FileComparatorApp extends Application {
                 String serviceFeeResult = ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords);
                 resultArea.setText(comparisonResult + "\n" + serviceFeeResult);
             } else {
-                resultArea.setText("Please provide one CSV file and one Excel file.");
+                resultArea.setText("Please provide one ESP CSV file and one FlixBus Excel file.");
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "An error occurred while comparing files.", e);

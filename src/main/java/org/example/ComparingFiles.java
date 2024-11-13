@@ -170,7 +170,9 @@ public class ComparingFiles {
             result.append("\nUnmatched FlixBus Records:\n");
             for (FlixBusRecord record : unmatchedFlixbusList) {
                 String formattedBookingNumber = formatSerialNumber(record.bookingNumber());
-                result.append(String.format("%-20s | %-10.2f%n", formattedBookingNumber, record.cash()));
+                if (!formattedBookingNumber.isEmpty()) {
+                    result.append(String.format("%-20s | %-10.2f%n", formattedBookingNumber, record.cash()));
+                }
             }
         } else {
             result.append("\nNo unmatched FlixBus records.\n");
@@ -187,6 +189,7 @@ public class ComparingFiles {
 
         return result.toString();
     }
+
     public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords) {
         StringBuilder result = new StringBuilder();
 
@@ -261,9 +264,6 @@ public class ComparingFiles {
     }
 
     private static String formatSerialNumber(String serialNumber) {
-        if (serialNumber == null || serialNumber.isEmpty()) {
-            return "N/A";
-        }
         try {
             return new java.math.BigDecimal(serialNumber).toPlainString();
         } catch (NumberFormatException e) {
