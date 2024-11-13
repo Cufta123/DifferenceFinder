@@ -39,7 +39,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -78,11 +78,6 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="QodanaReportsService">
-    <option name="descriptions">
-      <ReportDescription localRun="true" path="C:\Users\anton\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="7359f184-a320-44ec-bfb3-049a3ccc1b98" reportId="difference_finder/qodana/2024-11-12" />
-    </option>
-  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\anton\OneDrive\Documents\GitHub\DifferenceFinder\src\main\java\org\example\xlsx_files" />
@@ -168,7 +163,7 @@
       <workItem from="1731485984703" duration="181000" />
       <workItem from="1731486178563" duration="1199000" />
       <workItem from="1731487402695" duration="2942000" />
-      <workItem from="1731490908664" duration="6398000" />
+      <workItem from="1731490908664" duration="9330000" />
     </task>
     <task id="LOCAL-00001" summary="List with 2 entries">
       <option name="closed" value="true" />

@@ -52,7 +52,7 @@ public class ComparingFiles {
         double TotalAmountDifference = Math.abs(combinedESPListTotalAmount - combinedFlixBusListTotalAmount);
         return String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f  |   ESP Total Amount: %.2f%n" +
                         "Flixbus summary: %.2f  |   Total Comm_gross: %.3f |  Flixbus Total Amount: %.2f%n" +
-                        "Difference:      %.2f    |   Difference:       %.3f  |   Difference: %.2f%n",
+                        "Difference:      %.2f    |   Difference:       %.3f  |   Difference: %.2f%n%n",
                 espTotalAmount, suplierMarginTotalAmount, combinedESPListTotalAmount, flixbusTotalCash, totalComm_gross, combinedFlixBusListTotalAmount, absoluteDifference, commGrossSupplierMarginDiff, TotalAmountDifference);
     }
 
@@ -144,25 +144,39 @@ public class ComparingFiles {
 
     private static String formatRecordsList() {
         StringBuilder result = new StringBuilder();
-        result.append("Matched Records:\n");
-        result.append(String.format("%-20s | %-10s | %-20s | %-10s | %-10s%n", "ESP Serial", "ESP Amount", "Booking Number", "Cash", "Cash Equal"));
+
+        boolean hasDifferentPrices = false;
         for (MatchedRecord record : matchedRecordsList) {
             ESPRecord espRecord = record.espRecord();
             FlixBusRecord flixBusRecord = (FlixBusRecord) record.record();
-            String formattedBookingNumber = formatSerialNumber(flixBusRecord.bookingNumber());
-            String cashEqual = String.format("%.2f", espRecord.amount()).equals(String.format("%.2f", flixBusRecord.cash())) ? "Equal" : "Not Equal";
-            result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f | %-10s%n",
-                    espRecord.serialNumber(), espRecord.amount(), formattedBookingNumber, flixBusRecord.cash(), cashEqual));
+            double epsilon = 0.0001; // Small value to account for floating-point precision
+            if (Math.abs(espRecord.amount() - flixBusRecord.cash()) > epsilon) {
+                if (!hasDifferentPrices) {
+                    result.append("Matched Records with Different Prices:\n");
+                    result.append(String.format("%-20s | %-10s | %-20s | %-10s%n", "ESP Serial", "ESP Amount", "Booking Number", "Cash"));
+                    hasDifferentPrices = true;
+                }
+                String formattedBookingNumber = formatSerialNumber(flixBusRecord.bookingNumber());
+                result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
+                        espRecord.serialNumber(), espRecord.amount(), formattedBookingNumber, flixBusRecord.cash()));
+            }
         }
+
+        if (!hasDifferentPrices) {
+            result.append("All matched records have the same price.\n");
+        }
+
         result.append("\nUnmatched FlixBus Records:\n");
         for (FlixBusRecord record : unmatchedFlixbusList) {
             String formattedBookingNumber = formatSerialNumber(record.bookingNumber());
             result.append(String.format("%-20s | %-10.2f%n", formattedBookingNumber, record.cash()));
         }
+
         result.append("\nUnmatched ESP Records:\n");
         for (ESPRecord record : unmatchedESPList) {
             result.append(String.format("%-20s | %-10.2f%n", record.serialNumber(), record.amount()));
         }
+
         return result.toString();
     }
 
@@ -183,7 +197,8 @@ public class ComparingFiles {
         }
 
         for (FeeRecord feeRecord : combinedFeeList) {
-            String feeSerial = formatSerialNumber(feeRecord.bookingNumber());
+            String feeSerial;
+            feeSerial = formatSerialNumber(feeRecord.bookingNumber());
             ESPRecord matchedESPRecord = espRecordMap.get(feeSerial);
 
             if (matchedESPRecord != null) {
