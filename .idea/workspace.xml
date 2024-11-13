@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3fc1cb73-c777-4852-9680-8318ea7f9e7f" name="Changes" comment="List with 2 entries">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +143,7 @@
       <workItem from="1730963979544" duration="3042000" />
       <workItem from="1731064785301" duration="9000" />
       <workItem from="1731395983473" duration="6671000" />
-      <workItem from="1731482855240" duration="690000" />
+      <workItem from="1731482855240" duration="1352000" />
     </task>
     <task id="LOCAL-00001" summary="List with 2 entries">
       <option name="closed" value="true" />

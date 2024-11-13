@@ -199,8 +199,9 @@ public class ComparingFiles {
         for (MatchedRecord record : matchedFeeRecordsList) {
             ESPRecord espRecord = record.espRecord();
             FeeRecord feeRecord = (FeeRecord) record.record();
+            String formattedBookingNumber = formatSerialNumber(feeRecord.bookingNumber());
             result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
-                    espRecord.serialNumber(), espRecord.serviceFee(), feeRecord.bookingNumber(), feeRecord.getFeeAmount()));
+                    espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, feeRecord.getFeeAmount()));
         }
 
         result.append("\nUnmatched Fee Records:\n");
