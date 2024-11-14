@@ -49,10 +49,11 @@ public class FileComparatorApp extends Application {
         resultArea.setEditable(false);
 
         VBox vbox = new VBox(10, file1Label, file1PathField, file1Button, file2Label, file2PathField, file2Button, compareButton, resultArea);
-        vbox.setPrefSize(500, 500); // Set preferred size for VBox
+        vbox.setPrefSize(500, 600); // Set preferred size for VBox
         VBox.setVgrow(resultArea, Priority.ALWAYS); // Allow TextArea to grow
 
-        Scene scene = new Scene(vbox, 700, 700); // Increase the size of the Scene
+        Scene scene = new Scene(vbox, 900, 800); // Increase the size of the Scene
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm()); // Apply CSS
 
         primaryStage.setScene(scene);
         primaryStage.show();
