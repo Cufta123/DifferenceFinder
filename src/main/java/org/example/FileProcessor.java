@@ -40,9 +40,7 @@ public class FileProcessor {
                     continue;
                 }
                 Record record = parseFlixBusRow(row);
-                if (record != null) {
-                    records.add(record);
-                }
+                records.add(record);
             }
         }
         return records;
@@ -66,20 +64,22 @@ public class FileProcessor {
         String paymentType = getCellValue(row.getCell(7));
         String comGrossStr = getCellValue(row.getCell(16));
 
-        if ("Cash, Voucher".equals(paymentType) || "Credit card, Voucher".equals(paymentType)) {
-            return null; // Skip records with paymentType "Cash, Voucher" or "Credit Card, Voucher"
-        }
+
 
         double totalAmount = totalAmountStr.isEmpty() ? 0.0 : Double.parseDouble(totalAmountStr);
         double cash = cashStr.isEmpty() ? 0.0 : Double.parseDouble(cashStr);
         double voucher = voucherStr.isEmpty() ? 0.0 : Double.parseDouble(voucherStr);
         double comGross = comGrossStr.isEmpty() ? 0.0 : Double.parseDouble(comGrossStr);
 
+        if ("Cash, Voucher".equals(paymentType) || "Credit card, Voucher".equals(paymentType)) {
+            return new VoucherFlixBusRecord(bookingNumber, tripServices,voucher,paymentType,comGross,totalAmount);// Skip records with paymentType "Cash, Voucher" or "Credit Card, Voucher"
+        }
         if ("PlatformFee".equals(tripServices)) {
             return new FeeRecord(bookingNumber, cash);
         } else {
             return new FlixBusRecord(bookingNumber, tripServices, cash, voucher, paymentType, comGross, totalAmount);
         }
+
     }
 
     private static String getCellValue(Cell cell) {

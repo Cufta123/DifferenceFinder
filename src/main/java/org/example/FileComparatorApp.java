@@ -52,7 +52,7 @@ public class FileComparatorApp extends Application {
         vbox.setPrefSize(500, 500); // Set preferred size for VBox
         VBox.setVgrow(resultArea, Priority.ALWAYS); // Allow TextArea to grow
 
-        Scene scene = new Scene(vbox, 550, 550); // Increase the size of the Scene
+        Scene scene = new Scene(vbox, 700, 700); // Increase the size of the Scene
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -74,13 +74,14 @@ public class FileComparatorApp extends Application {
             List<ESPRecord> espRecords = null;
             List<Record> flixbusRecords = null;
             List<Record> flixbusFeeRecords = null;
-
+            List<Record> voucherFlixbusRecords = null;
             String fileType1 = FileProcessor.determineFileType(file1Path);
             String fileType2 = FileProcessor.determineFileType(file2Path);
 
             if ("CSV".equals(fileType1)) {
                 espRecords = FileProcessor.readESPFile(file1Path);
             } else if ("EXCEL".equals(fileType1)) {
+                voucherFlixbusRecords = FileProcessor.readFlixBusFile(file1Path);
                 flixbusRecords = FileProcessor.readFlixBusFile(file1Path);
                 flixbusFeeRecords = FileProcessor.readFlixBusFile(file1Path);
             }
@@ -88,12 +89,13 @@ public class FileComparatorApp extends Application {
             if ("CSV".equals(fileType2)) {
                 espRecords = FileProcessor.readESPFile(file2Path);
             } else if ("EXCEL".equals(fileType2)) {
+                voucherFlixbusRecords = FileProcessor.readFlixBusFile(file2Path);
                 flixbusRecords = FileProcessor.readFlixBusFile(file2Path);
                 flixbusFeeRecords = FileProcessor.readFlixBusFile(file2Path);
             }
 
             if (espRecords != null && flixbusRecords != null) {
-                String comparisonResult = ComparingFiles.compareFiles(espRecords, flixbusRecords, flixbusFeeRecords);
+                String comparisonResult = ComparingFiles.compareFiles(espRecords, flixbusRecords, flixbusFeeRecords, voucherFlixbusRecords);
                 String serviceFeeResult = ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords);
                 resultArea.setText(comparisonResult + "\n" + serviceFeeResult);
             } else {

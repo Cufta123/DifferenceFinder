@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3fc1cb73-c777-4852-9680-8318ea7f9e7f" name="Changes" comment="List with 2 entries">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/VoucherFlixBusRecord.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.bat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileComparatorApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,9 +21,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
         <option value="JUnit5 Test Class" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -53,32 +57,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Batch.run.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "git-widget-placeholder": "application-jar",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/anton/OneDrive/Documents/GitHub/DifferenceFinder/src/main/java/org/example/xlsx_files",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "C:/Users/anton/OneDrive/Documents/GitHub/BarHop/difference_finder/src/main/java/org/example/Main.java",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.2",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Batch.run.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.difference_finder-1.0-SNAPSHOT.jar.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;application-jar&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/anton/OneDrive/Documents/GitHub/DifferenceFinder/src/main/java/org/example/xlsx_files&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/anton/OneDrive/Documents/GitHub/BarHop/difference_finder/src/main/java/org/example/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\anton\OneDrive\Documents\GitHub\DifferenceFinder\src\main\java\org\example\xlsx_files" />
@@ -124,13 +129,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="difference_finder-1.0-SNAPSHOT.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/target/difference_finder-1.0-SNAPSHOT.jar" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Application.Main" />
       <item itemvalue="Batch.run" />
+      <item itemvalue="JAR Application.difference_finder-1.0-SNAPSHOT.jar" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
+        <item itemvalue="JAR Application.difference_finder-1.0-SNAPSHOT.jar" />
         <item itemvalue="Batch.run" />
       </list>
     </recent_temporary>
@@ -164,7 +175,8 @@
       <workItem from="1731485984703" duration="181000" />
       <workItem from="1731486178563" duration="1199000" />
       <workItem from="1731487402695" duration="2942000" />
-      <workItem from="1731490908664" duration="11191000" />
+      <workItem from="1731490908664" duration="16234000" />
+      <workItem from="1731569026272" duration="5632000" />
     </task>
     <task id="LOCAL-00001" summary="List with 2 entries">
       <option name="closed" value="true" />
