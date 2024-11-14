@@ -209,6 +209,19 @@ public class ComparingFiles {
         if (!hasDifferentPrices) {
             result.append("All matched records have the same price.\n");
         }
+    // Check if there are any matched voucher records and display them as they affect total amounts
+        boolean hasMatchedVoucherRecords = matchedRecordsList.stream().anyMatch(record -> record.record() instanceof VoucherFlixBusRecord);
+        if (hasMatchedVoucherRecords) {
+            result.append("\nMatched Voucher Records:\n");
+            for (MatchedRecord record : matchedRecordsList) {
+                if (record.record() instanceof VoucherFlixBusRecord) {
+                    VoucherFlixBusRecord voucherRecord = (VoucherFlixBusRecord) record.record();
+                    String formattedBookingNumber = formatSerialNumber(voucherRecord.bookingNumber());
+                    result.append(String.format("%-13s | %-18.2f | %-25.2f | %-25.2f | %-30s | %-10.2f | %-10.2f%n",
+                            record.espRecord().serialNumber(), record.espRecord().amount(), record.espRecord().suplierMargin(), record.espRecord().suplierMargin(), formattedBookingNumber, voucherRecord.voucher(), voucherRecord.comm_gross()));
+                }
+            }
+        }
 
         if (!unmatchedFlixbusList.isEmpty()) {
             result.append("\nUnmatched FlixBus Records:\n");
@@ -230,6 +243,7 @@ public class ComparingFiles {
         } else {
             result.append("\nNo unmatched ESP records.\n");
         }
+
 
         return result.toString();
     }
