@@ -96,7 +96,7 @@ public class FileComparatorApp extends Application {
 
             if (espRecords != null && flixbusRecords != null) {
                 String comparisonResult = ComparingFiles.compareFiles(espRecords, flixbusRecords, flixbusFeeRecords, voucherFlixbusRecords);
-                String serviceFeeResult = ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords);
+                String serviceFeeResult = ComparingFiles.printServiceFee(espRecords, flixbusFeeRecords, flixbusRecords, voucherFlixbusRecords);
                 resultArea.setText(comparisonResult + "\n" + serviceFeeResult);
             } else {
                 resultArea.setText("Please provide one ESP CSV file and one FlixBus Excel file.");

@@ -234,11 +234,13 @@ public class ComparingFiles {
         return result.toString();
     }
 
-    public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords) {
+    public static String printServiceFee(List<ESPRecord> espRecords, List<Record> feeRecords, List<Record> flixbusRecords, List<Record> voucherFlixBusRecords) {
         StringBuilder result = new StringBuilder();
 
         List<ESPRecord> combinedESPList = combineESPRecords(espRecords);
         List<FeeRecord> combinedFeeList = combineFlixBusFeeRecords(feeRecords);
+        List<FlixBusRecord> combinedFlixBusList = combineFlixBusRecords(flixbusRecords);
+        List<VoucherFlixBusRecord> combinedVoucherFlixBusList = combineVoucherFlixBusRecords(voucherFlixBusRecords);
 
         sortRecords(combinedESPList, combinedFeeList);
 
@@ -265,18 +267,67 @@ public class ComparingFiles {
 
         unmatchedESPFeeList.addAll(espRecordMap.values());
 
+        // If there are no FlixBus fee records, match ESP fee records to FlixBus records or VoucherFlixBus records
+        if (matchedFeeRecordsList.isEmpty()) {
+            result.append("No flixbus fee records found, comparing IDs instead.\n");
+            for (ESPRecord espRecord : unmatchedESPFeeList) {
+                String espSerial = formatSerialNumber(espRecord.serialNumber());
+                for (FlixBusRecord flixBusRecord : combinedFlixBusList) {
+                    String flixBusSerial = formatSerialNumber(flixBusRecord.bookingNumber());
+                    if (espSerial.equals(flixBusSerial)) {
+                        matchedFeeRecordsList.add(new MatchedRecord(espRecord, flixBusRecord));
+                        espRecordMap.remove(espSerial); // Ensure the map is updated correctly
+                    }
+                }
+                for (VoucherFlixBusRecord voucherRecord : combinedVoucherFlixBusList) {
+                    String voucherSerial = formatSerialNumber(voucherRecord.bookingNumber());
+                    if (espSerial.equals(voucherSerial)) {
+                        matchedFeeRecordsList.add(new MatchedRecord(espRecord, voucherRecord));
+                        espRecordMap.remove(espSerial); // Ensure the map is updated correctly
+                    }
+                }
+            }
+            unmatchedESPFeeList.clear();
+            unmatchedESPFeeList.addAll(espRecordMap.values());
+        }
+
         boolean hasDifferentAmounts = false;
         for (MatchedRecord record : matchedFeeRecordsList) {
             ESPRecord espRecord = record.espRecord();
-            FeeRecord feeRecord = (FeeRecord) record.record();
-            if (Math.abs(espRecord.serviceFee() - feeRecord.getFeeAmount()) > 0.0001) {
-                if (!hasDifferentAmounts) {
-                    result.append("\nMatched Fee Records with Different Amounts:\n");
-                    hasDifferentAmounts = true;
+            Record feeRecord = record.record();
+            if (feeRecord instanceof FeeRecord) {
+                FeeRecord fee = (FeeRecord) feeRecord;
+                if (Math.abs(espRecord.serviceFee() - fee.getFeeAmount()) > 0.0001) {
+                    if (!hasDifferentAmounts) {
+                        result.append("\nMatched Fee Records with Different Amounts:\n");
+                        hasDifferentAmounts = true;
+                    }
+                    String formattedBookingNumber = formatSerialNumber(fee.bookingNumber());
+                    result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
+                            espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, fee.getFeeAmount()));
                 }
-                String formattedBookingNumber = formatSerialNumber(feeRecord.bookingNumber());
-                result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
-                        espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, feeRecord.getFeeAmount()));
+            } else if (feeRecord instanceof FlixBusRecord) {
+                FlixBusRecord flixBus = (FlixBusRecord) feeRecord;
+                if (Math.abs(espRecord.serviceFee() - flixBus.cash()) > 0.0001) {
+                    if (!hasDifferentAmounts) {
+                        result.append("\nMatched Fee Records with Different Amounts:\n");
+                        hasDifferentAmounts = true;
+                    }
+                    String formattedBookingNumber = formatSerialNumber(flixBus.bookingNumber());
+                    result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
+                            espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, flixBus.cash()));
+                }
+            } else if (feeRecord instanceof VoucherFlixBusRecord) {
+                VoucherFlixBusRecord voucher = (VoucherFlixBusRecord) feeRecord;
+                if (Math.abs(espRecord.serviceFee() - voucher.voucher()) > 0.0001) {
+                    if (!hasDifferentAmounts) {
+                        result.append("\nMatched Fee Records with Different Amounts:\n");
+                        hasDifferentAmounts = true;
+                    }
+                    String formattedBookingNumber = formatSerialNumber(voucher.bookingNumber());
+                    result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
+                            espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, voucher.voucher()));
+                }
             }
         }
 
