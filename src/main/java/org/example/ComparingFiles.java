@@ -180,8 +180,7 @@ public class ComparingFiles {
             Record flixBusRecord = record.record();
             double epsilon = 0.0001; // Small value to account for floating-point precision
 
-            if (flixBusRecord instanceof FlixBusRecord) {
-                FlixBusRecord flixRecord = (FlixBusRecord) flixBusRecord;
+            if (flixBusRecord instanceof FlixBusRecord flixRecord) {
                 if (Math.abs(espRecord.amount() - flixRecord.cash()) > epsilon) {
                     if (!hasDifferentPrices) {
                         result.append("Matched Records with Different Prices:\n");
@@ -192,8 +191,7 @@ public class ComparingFiles {
                     result.append(String.format("%-13s | %-18.2f | %-25.2f | %-25.2f | %-30s | %-10.2f | %-10.2f%n",
                             espRecord.serialNumber(), espRecord.amount(), espRecord.suplierMargin(), espRecord.suplierMargin(), formattedBookingNumber, flixRecord.cash(), flixRecord.comm_gross()));
                 }
-            } else if (flixBusRecord instanceof VoucherFlixBusRecord) {
-                VoucherFlixBusRecord voucherRecord = (VoucherFlixBusRecord) flixBusRecord;
+            } else if (flixBusRecord instanceof VoucherFlixBusRecord voucherRecord) {
                 if (Math.abs(espRecord.amount() - voucherRecord.voucher()) > epsilon) {
                     if (hasDifferentPrices) {
                         result.append("Matched Records with Different Prices:\n");
@@ -214,8 +212,7 @@ public class ComparingFiles {
         if (hasMatchedVoucherRecords) {
             result.append("\nMatched Voucher Records:\n");
             for (MatchedRecord record : matchedRecordsList) {
-                if (record.record() instanceof VoucherFlixBusRecord) {
-                    VoucherFlixBusRecord voucherRecord = (VoucherFlixBusRecord) record.record();
+                if (record.record() instanceof VoucherFlixBusRecord voucherRecord) {
                     String formattedBookingNumber = formatSerialNumber(voucherRecord.bookingNumber());
                     result.append(String.format("%-13s | %-18.2f | %-25.2f | %-25.2f | %-30s | %-10.2f | %-10.2f%n",
                             record.espRecord().serialNumber(), record.espRecord().amount(), record.espRecord().suplierMargin(), record.espRecord().suplierMargin(), formattedBookingNumber, voucherRecord.voucher(), voucherRecord.comm_gross()));
@@ -260,7 +257,6 @@ public class ComparingFiles {
 
         List<FeeRecord> unmatchedFeeList = new ArrayList<>();
         List<MatchedRecord> matchedFeeRecordsList = new ArrayList<>();
-        List<ESPRecord> unmatchedESPFeeList = new ArrayList<>();
 
         Map<String, ESPRecord> espRecordMap = new HashMap<>();
         for (ESPRecord espRecord : combinedESPList) {
@@ -279,7 +275,7 @@ public class ComparingFiles {
             }
         }
 
-        unmatchedESPFeeList.addAll(espRecordMap.values());
+        List<ESPRecord> unmatchedESPFeeList = new ArrayList<>(espRecordMap.values());
 
         // If there are no FlixBus fee records, match ESP fee records to FlixBus records or VoucherFlixBus records
         if (matchedFeeRecordsList.isEmpty()) {
@@ -309,8 +305,7 @@ public class ComparingFiles {
         for (MatchedRecord record : matchedFeeRecordsList) {
             ESPRecord espRecord = record.espRecord();
             Record feeRecord = record.record();
-            if (feeRecord instanceof FeeRecord) {
-                FeeRecord fee = (FeeRecord) feeRecord;
+            if (feeRecord instanceof FeeRecord fee) {
                 if (Math.abs(espRecord.serviceFee() - fee.getFeeAmount()) > 0.0001) {
                     if (!hasDifferentAmounts) {
                         result.append("\nMatched Fee Records with Different Amounts:\n");
@@ -320,8 +315,7 @@ public class ComparingFiles {
                     result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
                             espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, fee.getFeeAmount()));
                 }
-            } else if (feeRecord instanceof FlixBusRecord) {
-                FlixBusRecord flixBus = (FlixBusRecord) feeRecord;
+            } else if (feeRecord instanceof FlixBusRecord flixBus) {
                 if (Math.abs(espRecord.serviceFee() - flixBus.cash()) > 0.0001) {
                     if (!hasDifferentAmounts) {
                         result.append("\nMatched Fee Records with Different Amounts:\n");
@@ -331,8 +325,7 @@ public class ComparingFiles {
                     result.append(String.format("%-20s | %-10.2f | %-20s | %-10.2f%n",
                             espRecord.serialNumber(), espRecord.serviceFee(), formattedBookingNumber, flixBus.cash()));
                 }
-            } else if (feeRecord instanceof VoucherFlixBusRecord) {
-                VoucherFlixBusRecord voucher = (VoucherFlixBusRecord) feeRecord;
+            } else if (feeRecord instanceof VoucherFlixBusRecord voucher) {
                 if (Math.abs(espRecord.serviceFee() - voucher.voucher()) > 0.0001) {
                     if (!hasDifferentAmounts) {
                         result.append("\nMatched Fee Records with Different Amounts:\n");
