@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,15 +16,36 @@ public class FileProcessor {
 
     public static List<ESPRecord> readESPFile(String filePath) throws IOException {
         try (Stream<String> lines = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
-            return lines
-                    .skip(1) // Skip header
-                    .map(line -> line.split(";")) // Split by semicolon
-                    .filter(parts -> parts.length > 17) // Ensure there are more than 17 columns
-                    .map(parts -> {
-                        double value = parts.length > 20 ? Double.parseDouble(parts[20]) : Double.parseDouble(parts[17]);
-                        return new ESPRecord(parts[5], Double.parseDouble(parts[11]), value, Double.parseDouble(parts[16]));
-                    })
-                    .collect(Collectors.toList());
+            Iterator<String> iterator = lines.iterator();
+            if (!iterator.hasNext()) {
+                return Collections.emptyList();
+            }
+
+            // Read the header row
+            String headerLine = iterator.next();
+            String[] headers = headerLine.split(";");
+            Map<String, Integer> headerMap = new HashMap<>();
+            for (int i = 0; i < headers.length; i++) {
+                headerMap.put(headers[i], i);
+            }
+
+            // Get the indices for the required columns
+            int serialNumberIndex = headerMap.get("Serial Number");
+            int amountIndex = headerMap.get("Amount");
+            int serviceFeeIndex = headerMap.get("Flixbus Service Fee");
+            int supplierMarginIndex = headerMap.get("Supplier Margin (Inc. Tax)");
+
+            // Process the remaining lines
+            List<ESPRecord> records = new ArrayList<>();
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+                String[] parts = line.split(";");
+                if (parts.length > Math.max(serviceFeeIndex, supplierMarginIndex)) {
+                    double value = parts.length > serviceFeeIndex ? Double.parseDouble(parts[serviceFeeIndex]) : Double.parseDouble(parts[supplierMarginIndex]);
+                    records.add(new ESPRecord(parts[serialNumberIndex], Double.parseDouble(parts[amountIndex]), value, Double.parseDouble(parts[supplierMarginIndex])));
+                }
+            }
+            return records;
         }
     }
 
@@ -48,7 +68,7 @@ public class FileProcessor {
 
     private static boolean containsTotal(Row row) {
         for (Cell cell : row) {
-            if (getCellValue(cell).contains("Total")) {
+            if (getCellValue(cell).contains("Total")|| getCellValue(cell).contains("Summe")) {
                 return true;
             }
         }

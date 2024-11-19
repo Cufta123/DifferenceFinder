@@ -51,9 +51,9 @@ public class ComparingFiles {
         double combinedESPListTotalAmount = combinedESPList.stream().mapToDouble(ESPRecord::getTotalAmount).sum();
         double combinedFlixBusListTotalAmount = getFlixBusTotalAmount(combinedFlixbusList, combinedFlixBusFeeRecords);
         double TotalAmountDifference = Math.abs(combinedESPListTotalAmount - combinedFlixBusListTotalAmount);
-        return String.format("ESP summary:     %.2f  |   Suplier Margin:   %.3f  |   ESP Total Amount: %.2f%n" +
-                        "Flixbus summary: %.2f  |   Total Comm_gross: %.3f |  Flixbus Total Amount: %.2f%n" +
-                        "Difference:      %.2f    |   Difference:       %.3f  |   Difference: %.2f%n%n",
+        return String.format("ESP summary:     %.2f  |   Suplier Margin:   %14.3f  |   ESP Total Amount: %10.2f%n" +
+                        "Flixbus summary: %.2f  |   Total Comm Gross: %9.3f  |  Flixbus Total Amount: %.2f%n" +
+                        "Difference:      %12.2f    |   Difference:       %18.3f  |   Difference: %24.2f%n%n",
                 espTotalAmount, suplierMarginTotalAmount, combinedESPListTotalAmount, flixbusTotalCash, totalComm_gross, combinedFlixBusListTotalAmount, absoluteDifference, commGrossSupplierMarginDiff, TotalAmountDifference);
     }
     private static List<VoucherFlixBusRecord> combineVoucherFlixBusRecords(List<Record> voucherFlixBusRecords) {
@@ -188,7 +188,7 @@ public class ComparingFiles {
                         hasDifferentPrices = true;
                     }
                     String formattedBookingNumber = formatSerialNumber(flixRecord.bookingNumber());
-                    result.append(String.format("%-13s | %-18.2f | %-25.2f | %-25.2f | %-30s | %-10.2f | %-10.2f%n",
+                    result.append(String.format("%-14s | %-19.2f | %-26.2f | %-26.2f | %-30s | %-10.2f | %-10.2f%n",
                             espRecord.serialNumber(), espRecord.amount(), espRecord.suplierMargin(), espRecord.suplierMargin(), formattedBookingNumber, flixRecord.cash(), flixRecord.comm_gross()));
                 }
             } else if (flixBusRecord instanceof VoucherFlixBusRecord voucherRecord) {
