@@ -1,4 +1,3 @@
-// FileComparatorApp.java
 package org.example;
 
 import javafx.application.Application;
@@ -33,7 +32,7 @@ public class FileComparatorApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("File Comparator");
-        primaryStage.getIcons().add(new Image("file:src/main/resources/icon-1.png"));
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon-1.png"))));
 
         Label file1Label = new Label("File 1:");
         file1PathField = new TextField();
