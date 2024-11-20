@@ -7,6 +7,11 @@
     <list default="true" id="3fc1cb73-c777-4852-9680-8318ea7f9e7f" name="Changes" comment="List with 2 entries">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ComparingFiles.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ESPRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/ESPRecord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FileProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/FlixBusRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/FlixBusRecord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/SummaryRecord.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/VoucherFlixBusRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/VoucherFlixBusRecord.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -177,7 +182,7 @@
       <workItem from="1732000846385" duration="894000" />
       <workItem from="1732001769973" duration="3249000" />
       <workItem from="1732005076579" duration="8779000" />
-      <workItem from="1732088695302" duration="580000" />
+      <workItem from="1732088695302" duration="8066000" />
     </task>
     <task id="LOCAL-00001" summary="List with 2 entries">
       <option name="closed" value="true" />

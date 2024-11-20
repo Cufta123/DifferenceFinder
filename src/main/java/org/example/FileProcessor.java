@@ -81,7 +81,6 @@ public class FileProcessor {
         String totalAmountStr = getCellValue(row.getCell(14));
         String cashStr = getCellValue(row.getCell(14));
         String voucherStr = getCellValue(row.getCell(15));
-        String paymentType = getCellValue(row.getCell(7));
         String comGrossStr = getCellValue(row.getCell(16));
 
 
@@ -91,13 +90,13 @@ public class FileProcessor {
         double voucher = voucherStr.isEmpty() ? 0.0 : Double.parseDouble(voucherStr);
         double comGross = comGrossStr.isEmpty() ? 0.0 : Double.parseDouble(comGrossStr);
 
-        if ("Cash, Voucher".equals(paymentType) || "Credit card, Voucher".equals(paymentType)) {
-            return new VoucherFlixBusRecord(bookingNumber, tripServices,voucher,paymentType,comGross,totalAmount);// Skip records with paymentType "Cash, Voucher" or "Credit Card, Voucher"
+        if (cash == 0.0) {
+            return new VoucherFlixBusRecord(bookingNumber, tripServices, voucher, comGross, totalAmount);
         }
         if ("PlatformFee".equals(tripServices)) {
             return new FeeRecord(bookingNumber, cash);
         } else {
-            return new FlixBusRecord(bookingNumber, tripServices, cash, voucher, paymentType, comGross, totalAmount);
+            return new FlixBusRecord(bookingNumber, tripServices, cash, voucher, comGross, totalAmount);
         }
 
     }
